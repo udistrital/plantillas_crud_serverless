@@ -1,6 +1,7 @@
 # Post plantilla
 
 import json
+import bson
 import os
 from datetime import datetime
 from typing import List, Dict, Optional
@@ -23,22 +24,72 @@ print(PLANTILLAS_CRUD_DB)
 def local_now():
     return datetime.now(tz=pytz.timezone(TIMEZONE))
 
+class EstiloFuente(BaseModel):
+    id: int
+    tamaño: int
+    estilo: str
+    grosor: str
+    altura: int
+    separacion: int
+    decoracion: str
+    transformacion: str
+    alineacion: str
+    identacion: int
+    fechaCreacion: datetime = Field(default=local_now())
+    fechaModificacion: Optional[datetime] = None
+    activo: bool
 
+class CampoAdicional(BaseModel):
+    id: int
+    nombre: str
+    descripcion: str
+    valor: str
+    estilosFuente: EstiloFuente
+    fechaCreacion: datetime = Field(default=local_now())
+    fechaModificacion: Optional[datetime] = None
+    activo: bool
 class Seccion(BaseModel):
     id: int
-
+    nombre: str
+    descripcion: str
+    valor: str
+    camposAdicionales: CampoAdicional
+    estilosFuente: EstiloFuente
+    fechaCreacion: datetime = Field(default=local_now())
+    fechaModificacion: Optional[datetime] = None
+    activo: bool
 
 class Titulo(BaseModel):
     id: int
+    nombre: str
+    descripcion: str
+    valor: str
+    camposAdicionales: CampoAdicional
+    estilosFuente: EstiloFuente
+    fechaCreacion: datetime = Field(default=local_now())
+    fechaModificacion: Optional[datetime] = None
+    activo: bool
 
 
 class Minuta(BaseModel):
     id: int
+    nombre: str
+    descripcion: str
+    valor: str
+    camposAdicionales: CampoAdicional
+    estilosFuente: EstiloFuente
+    fechaCreacion: datetime = Field(default=local_now())
+    fechaModificacion: Optional[datetime] = None
+    activo: bool
 
 
 class Imagen(BaseModel):
     id: int
-
+    nombre: str
+    data: bson.Binary(0,'')
+    fechaCreacion: datetime = Field(default=local_now())
+    fechaModificacion: Optional[datetime] = None
+    activo: bool
 
 class PlantillaModel(BaseModel):
     id: int
@@ -46,13 +97,13 @@ class PlantillaModel(BaseModel):
     descripcion: str
     secciones: Seccion
     minutas: Minuta
-    Titulos: Titulo
-    Imagenes: Imagen
-    EnlaceDoc: str
-    Version: float
-    FechaCreacion: datetime = Field(default=local_now())
-    FechaModificacion: Optional[datetime] = None
-    Activo: bool
+    titulos: Titulo
+    imagenes: Imagen
+    enlaceDoc: str
+    version: float
+    fechaCreacion: datetime = Field(default=local_now())
+    fechaModificacion: Optional[datetime] = None
+    activo: bool
 
 
 def connect_db_client():
