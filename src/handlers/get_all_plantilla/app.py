@@ -11,12 +11,12 @@ PLANTILLAS_CRUD_USERNAME = os.environ.get('PLANTILLAS_CRUD_USERNAME')
 PLANTILAS_CRUD_PASS = os.environ.get('PLANTILAS_CRUD_PASS')
 PLANTILLAS_CRUD_DB = os.environ.get('PLANTILLAS_CRUD_DB')
 
+
 def connect_db_client():
     try:
         # With password
         if PLANTILLAS_CRUD_USERNAME and PLANTILAS_CRUD_PASS:
-            uri = f"mongodb://{PLANTILLAS_CRUD_USERNAME}:{PLANTILAS_CRUD_PASS}@" \
-                  f"{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
+            uri = 'mongodb+srv://yaov05:<password>@cluster0.1zngmom.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp'
         else:
             # Without password
             uri = f"mongodb://{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
@@ -28,7 +28,8 @@ def connect_db_client():
         print("Error Client DB")
         print(f"Detail: {ex}")
         return None
-    
+
+
 def close_connect_db(client):
     try:
         print("Closing client DB")
@@ -38,12 +39,18 @@ def close_connect_db(client):
         print("Error close Client DB")
         print(f"Detail: {ex}")
 
+
 def format_specific_values(result):
     if result.get("_id"):
         result["_id"] = str(result["_id"])
-    if result.get("fecha_creacion"):
-        result["fecha_creacion"] = str(result["fecha_creacion"])
+    if result.get("fechaCreacion"):
+        result["fechaCreacion"] = str(result["fechaCreacion"])
+    if result.get("fechaModificacion"):
+        result["fechaModificacion"] = str(result["fechaModificacion"])
+    if result.get("data"):
+        result["data"] = str(result["data"])
     return result
+
 
 def format_response(result, message: str, status_code: int, success: bool):
     if isinstance(result, dict):
@@ -83,16 +90,14 @@ def format_response(result, message: str, status_code: int, success: bool):
                         "Message": message
                     })}
 
+
 def lambda_handler(event, context):
-    
-    print('Se ejecuta!')
-    print(event)
     client = None
     try:
         client = connect_db_client()
         if client:
             print("Connecting database ...")
-            plantilla_collection = client[str(PLANTILLAS_CRUD_DB)]["plantilla"]
+            plantilla_collection = client["plantillas_bd_pruebas"]["Plantilla"]
             print("Connection database successful")
             plantilla = list(plantilla_collection.find({}))
             print(f"Consulted record.")
