@@ -14,9 +14,11 @@ PLANTILLAS_CRUD_DB = os.environ.get('PLANTILLAS_CRUD_DB')
 
 def connect_db_client():
     try:
+        # uri = 'mongodb+srv://yaov05:0519@cluster0.1zngmom.mongodb.net/'
         # With password
         if PLANTILLAS_CRUD_USERNAME and PLANTILAS_CRUD_PASS:
-            uri = 'mongodb+srv://yaov05:<password>@cluster0.1zngmom.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp'
+            uri = f"mongodb://{PLANTILLAS_CRUD_USERNAME}:{PLANTILAS_CRUD_PASS}@" \
+                f"{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
         else:
             # Without password
             uri = f"mongodb://{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
@@ -41,6 +43,39 @@ def close_connect_db(client):
 
 
 def format_specific_values(result):
+    # plantilla = list(result)
+    # print(plantilla)
+    # print("3", type(result))
+    # if isinstance(result, dict):
+    #     for campo, valor in result.items():
+    #         if isinstance(valor, list):
+    #             format_specific_values(valor)
+    #         else:
+    #             if campo == "_id" or campo == "fechaCreacion" or campo == "fechaModificacion" or campo == "data":
+    #                 print(campo)
+    # elif isinstance(result, list):
+    #     print(result)
+    #     for i, valor in enumerate(result):
+    #         print(type(valor))
+    #         if isinstance(valor, dict):
+    #             format_specific_values(valor)
+    #         else:
+    #             print("nnon")
+
+    # for campo, valor in result.items():
+    #     print("3", type(campo))
+    #     print("3", type(valor))
+    #     if isinstance(campo, dict):
+    #         format_specific_values(campo)
+    #     else:
+    #         if "_id" in campo or "fechaCreacion" in campo or "fechaModificacion" in campo or "data" in campo:
+    #             print(campo)
+            # if elemento.get("fechaCreacion"):
+            #     elemento["fechaCreacion"] = str(elemento["fechaCreacion"])
+            # if elemento.get("fechaModificacion"):
+            #     elemento["fechaModificacion"] = str(elemento["fechaModificacion"])
+            # if elemento.get("data"):
+            #     elemento["data"] = str(elemento["data"])
     if result.get("_id"):
         result["_id"] = str(result["_id"])
     if result.get("fechaCreacion"):
@@ -49,6 +84,11 @@ def format_specific_values(result):
         result["fechaModificacion"] = str(result["fechaModificacion"])
     if result.get("data"):
         result["data"] = str(result["data"])
+    if result.get("Secciones"):
+        result["Secciones"] = str(result["Secciones"])
+    if result.get("Imagenes"):
+        result["Imagenes"] = str(result["Imagenes"])
+                
     return result
 
 
@@ -104,7 +144,6 @@ def lambda_handler(event, context):
             if plantilla:
                 print("plantilla found!")
                 print(plantilla)
-                print(type(plantilla))
                 return format_response(
                     plantilla,
                     "plantilla OK",
