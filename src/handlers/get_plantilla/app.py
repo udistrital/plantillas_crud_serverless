@@ -49,8 +49,10 @@ def format_response(result, message: str, status_code: int, success: bool):
         if success:
             if result.get("_id"):
                 result["_id"] = str(result["_id"])
-            if result.get("fecha_creacion"):
-                result["fecha_creacion"] = str(result["fecha_creacion"])
+            if result.get("fechaCreacion"):
+                result["fechaCreacion"] = str(result["fechaCreacion"])
+            if result.get("fechaModificacion"):
+                result["fechaModificacion"] = str(result["fechaModificacion"])
 
             return {"statusCode": status_code,
                     "body": json.dumps({

@@ -3,7 +3,7 @@
 import json
 import os
 
-from bson import ObjectId
+# from bson import ObjectId
 from pymongo import MongoClient
 
 PLANTILLAS_CRUD_HOST = os.environ.get('PLANTILLAS_CRUD_HOST')
@@ -45,8 +45,10 @@ def close_connect_db(client):
 def format_specific_values(result):
     if result.get("_id"):
         result["_id"] = str(result["_id"])
-    if result.get("fecha_creacion"):
-        result["fecha_creacion"] = str(result["fecha_creacion"])
+    if result.get("fechaCreacion"):
+        result["fechaCreacion"] = str(result["fechaCreacion"])
+    if result.get("fechaModificacion"):
+        result["fechaModificacion"] = str(result["fechaModificacion"])
     return result
 
 
@@ -95,7 +97,8 @@ def lambda_handler(event, context):
         client = connect_db_client()
         if client:
             print("Connecting database ...")
-            plantilla_collection = client[str(PLANTILLAS_CRUD_DB)]["plantilla"]
+            plantilla_collection = client["plantillas_bd_pruebas"]["Plantilla"]
+            print(plantilla_collection)
             print("Connection database successful")
             plantilla = list(plantilla_collection.find({}))
             print(f"Consulted record.")
@@ -113,14 +116,14 @@ def lambda_handler(event, context):
                 close_connect_db(client)
         return format_response(
             {},
-            "Error get plantilla!",
+            "Error get plantilla! 1",
             403,
             False)
     except Exception as ex:
-        print("Error get plantilla")
+        print("Error get plantilla 2")
         print(f"Detail: {ex}")
         return format_response(
             {},
-            "Error get plantilla!",
+            "Error get plantilla 3!",
             403,
             False)

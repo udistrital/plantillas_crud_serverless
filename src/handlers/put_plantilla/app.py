@@ -23,36 +23,17 @@ print(PLANTILLAS_CRUD_DB)
 def local_now():
     return datetime.now(tz=pytz.timezone(TIMEZONE))
 
-
-class Seccion(BaseModel):
-    id: int
-
-
-class Titulo(BaseModel):
-    id: int
-
-
-class Minuta(BaseModel):
-    id: int
-
-
-class Imagen(BaseModel):
-    id: int
-
-
 class PlantillaModel(BaseModel):
     id: int
+    tipo: str
     nombre: str
     descripcion: str
-    secciones: Seccion
-    minutas: Minuta
-    Titulos: Titulo
-    Imagenes: Imagen
-    EnlaceDoc: str
-    Version: float
+    contenido: str
+    enlace: str
     FechaCreacion: datetime = Field(default=local_now())
     FechaModificacion: Optional[datetime] = None
-    Activo: bool
+    version: float
+    versionActual: bool
 
 
 def connect_db_client():
@@ -96,11 +77,10 @@ def format_response(result, message: str, status_code: int, success: bool):
         if success:
             if result.get("_id"):
                 result["_id"] = str(result["_id"])
-            if result.get("fecha_creacion"):
-                result["fecha_creacion"] = str(result["fecha_creacion"])
-            if result.get("fecha_modificacion"):
-                result["fecha_modificacion"] = str(
-                    result["fecha_modificacion"])
+            if result.get("fechaCreacion"):
+                result["fechaCreacion"] = str(result["fechaCreacion"])
+            if result.get("fechaModificacion"):
+                result["fechaModificacion"] = str(result["fechaModificacion"])
 
             return {"statusCode": status_code,
                     "body": json.dumps({

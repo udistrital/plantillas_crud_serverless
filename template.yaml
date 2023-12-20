@@ -1,0 +1,160 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  plantillas-crud
+
+  SAM Template for plantillas-crud
+
+Globals:
+  Function:
+    Timeout: 60
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'*'"
+      AllowOrigin: "'*'"
+      AllowCredentials: "'*'"
+      
+
+Parameters:
+  CrudUsername:
+    Description: Database User Username
+    Type: String
+    Default: ""
+  CrudPass:
+    Type: String
+    Default: ""
+  CrudHost:
+    Type: String
+    Default: ""
+  CrudPort:
+    Type: String
+    Default: ""
+  CrudDB:
+    Type: String
+    Default: "plantillas_bd_local"
+  Timezone:
+    Type: String
+    Default: "America/Bogota"
+
+Resources:
+  CreatePlantillaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/create_plantilla/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Environment:
+        Variables:
+          PLANTILLAS_CRUD_HOST: !Ref CrudHost
+          PLANTILLAS_CRUD_PORT: !Ref CrudPort
+          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
+          PLANTILAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_DB: !Ref CrudDB
+          TIMEZONE: !Ref Timezone
+      Events:
+        CreatePlantilla:
+          Type: Api
+          Properties:
+            Path: /plantilla
+            Method: post
+
+  GetPlantillaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/get_plantilla/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Environment:
+        Variables:
+          PLANTILLAS_CRUD_HOST: !Ref CrudHost
+          PLANTILLAS_CRUD_PORT: !Ref CrudPort
+          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
+          PLANTILAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_DB: !Ref CrudDB
+      Events:
+        GetPlantilla:
+          Type: Api
+          Properties:
+            Path: /plantilla/{id}
+            Method: get
+
+  GetAllPlantillaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/get_all_plantilla/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Environment:
+        Variables:
+          PLANTILLAS_CRUD_HOST: !Ref CrudHost
+          PLANTILLAS_CRUD_PORT: !Ref CrudPort
+          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
+          PLANTILAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_DB: !Ref CrudDB
+      Events:
+        GetSyllabus:
+          Type: Api
+          Properties:
+            Path: /plantilla
+            Method: get
+
+  PutPlantillaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/put_plantilla/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Environment:
+        Variables:
+          PLANTILLAS_CRUD_HOST: !Ref CrudHost
+          PLANTILLAS_CRUD_PORT: !Ref CrudPort
+          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
+          PLANTILAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_DB: !Ref CrudDB
+          TIMEZONE: !Ref Timezone
+      Events:
+        PutSyllabus:
+          Type: Api
+          Properties:
+            Path: /plantilla/{id}
+            Method: put
+
+  DeletePlantillaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/delete_plantilla/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Environment:
+        Variables:
+          PLANTILLAS_CRUD_HOST: !Ref CrudHost
+          PLANTILLAS_CRUD_PORT: !Ref CrudPort
+          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
+          PLANTILAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_DB: !Ref CrudDB
+          TIMEZONE: !Ref Timezone
+      Events:
+        DeleteSyllabus:
+          Type: Api
+          Properties:
+            Path: /plantilla/{id}
+            Method: delete
+
+  HealthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/health/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Events:
+        Health:
+          Type: Api
+          Properties:
+            Path: /health
+            Method: get
+
+Outputs:
+  WebEndpoint:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
