@@ -7,5 +7,6 @@ sam build
 
 # Step 2 - Run
 echo "Running"
-sam local start-api --env-vars env.json
+
+sam local start-api --env-vars env.example.json
 

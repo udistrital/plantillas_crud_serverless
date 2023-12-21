@@ -23,7 +23,6 @@ print(PLANTILLAS_CRUD_DB)
 def local_now():
     return datetime.now(tz=pytz.timezone(TIMEZONE))
 
-
 class PlantillaModel(BaseModel):
     id: int
     tipo: str
@@ -35,7 +34,6 @@ class PlantillaModel(BaseModel):
     FechaModificacion: Optional[datetime] = None
     version: float
     versionActual: bool
-
 
 def connect_db_client():
     try:
@@ -83,6 +81,7 @@ def format_response(result, message: str, status_code: int, success: bool):
             if result.get("fechaModificacion"):
                 result["fechaModificacion"] = str(result["fechaModificacion"])
 
+
             return {"statusCode": status_code,
                     "body": json.dumps({
                         "Success": success,
@@ -110,7 +109,7 @@ def lambda_handler(event, context):
             if client:
                 print("Connecting database ...")
                 Plantilla_collection = client[str(
-                    PLANTILLAS_CRUD_DB)]["plantillas"]
+                    PLANTILLAS_CRUD_DB)]["plantilla"]
                 print("Connection database successful")
                 print("Inserting new plantilla")
                 result = Plantilla_collection.insert_one(Plantilla_data)

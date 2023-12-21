@@ -22,7 +22,6 @@ print(PLANTILLAS_CRUD_DB)
 
 def local_now():
     return datetime.now(tz=pytz.timezone(TIMEZONE))
-
 class PlantillaModel(BaseModel):
     id: int
     tipo: str

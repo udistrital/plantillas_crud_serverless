@@ -1,3 +1,4 @@
+
 # Get one plantilla
 
 import json
@@ -98,14 +99,12 @@ def lambda_handler(event, context):
         if client:
             print("Connecting database ...")
             plantilla_collection = client["plantillas_bd_pruebas"]["Plantilla"]
-            print(plantilla_collection)
             print("Connection database successful")
             plantilla = list(plantilla_collection.find({}))
             print(f"Consulted record.")
             if plantilla:
                 print("plantilla found!")
                 print(plantilla)
-                print(type(plantilla))
                 return format_response(
                     plantilla,
                     "plantilla OK",
