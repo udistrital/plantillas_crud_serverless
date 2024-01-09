@@ -16,15 +16,17 @@ PLANTILLAS_CRUD_DB = os.environ.get('PLANTILLAS_CRUD_DB')
 
 def connect_db_client():
     try:
-        # With password
-        if PLANTILLAS_CRUD_USERNAME and PLANTILAS_CRUD_PASS:
-            uri = f"mongodb://{PLANTILLAS_CRUD_USERNAME}:{PLANTILAS_CRUD_PASS}@" \
-                  f"{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
-        else:
-            # Without password
-            uri = f"mongodb://{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
+        # # With password
+        # if PLANTILLAS_CRUD_USERNAME and PLANTILAS_CRUD_PASS:
+        #     uri = f"mongodb+srv://{PLANTILLAS_CRUD_USERNAME}:{PLANTILAS_CRUD_PASS}@{PLANTILLAS_CRUD_HOST}/{PLANTILLAS_CRUD_DB}?retryWrites=true&w=majority"
+        # else:
+        #     # Without password
+        #     uri = f"mongodb+srv://{PLANTILLAS_CRUD_HOST}/{PLANTILLAS_CRUD_DB}?retryWrites=true&w=majority"
 
-        client = MongoClient(uri, uuidRepresentation='standard')
+        # uri = "mongodb://localhost:27017/"
+        uri = "mongodb+srv://yaov05:0519@cluster0.1zngmom.mongodb.net/?retryWrites=true&w=majority"
+
+        client = MongoClient(uri)
         print("Client DB Successful")
         return client
     except Exception as ex:
