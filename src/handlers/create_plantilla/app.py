@@ -38,14 +38,13 @@ class PlantillaModel(BaseModel):
 def connect_db_client():
     try:
         # With password
-        # if PLANTILLAS_CRUD_USERNAME and PLANTILAS_CRUD_PASS:
-        #     uri = f"mongodb://{PLANTILLAS_CRUD_USERNAME}:{PLANTILAS_CRUD_PASS}@" \
-        #           f"{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
-        # else:
-        #     # Without password
-        #     uri = f"mongodb://{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
+        if PLANTILLAS_CRUD_USERNAME and PLANTILAS_CRUD_PASS:
+            uri = f"mongodb://{PLANTILLAS_CRUD_USERNAME}:{PLANTILAS_CRUD_PASS}@" \
+                  f"{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
+        else:
+            # Without password
+            uri = f"mongodb://{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
 
-        uri = "mongodb://localhost:27017/"
 
         client = MongoClient(uri, uuidRepresentation='standard')
         print("Client DB Successful")
