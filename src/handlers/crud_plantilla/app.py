@@ -37,6 +37,7 @@ class PlantillaModel(BaseModel):
     tipo_plantilla_id: str
     sistema_id: str
     nombre: Optional[str] = None
+    codigo_abreviacion: Optional[str] = None
     contenido: Optional[str] = None
     grupo_id: Optional[str] = None
     version: Optional[int] = 0
@@ -47,16 +48,10 @@ class PlantillaModel(BaseModel):
 
 class PlantillaCreationModel(PlantillaModel):
     fecha_creacion: datetime = Field(default=local_now())
-    fecha_modificacion: Optional[datetime] = None
-
-
-class PlantillaUpdateModel(PlantillaModel):
-    fecha_modificacion: Optional[datetime] = Field(default=local_now())
 
 
 class DeletePlantillaModel(BaseModel):
     activo: Optional[bool] = Field(default=False)
-    fecha_modificacion: Optional[datetime] = Field(default=local_now())
 
 
 # Gestión de conexión con la BD
@@ -181,8 +176,6 @@ def format_specific_values(result):
         result["_id"] = str(result["_id"])
     if result.get("fecha_creacion"):
         result["fecha_creacion"] = str(result["fecha_creacion"])
-    if result.get("fecha_modificacion"):
-        result["fecha_modificacion"] = str(result["fecha_modificacion"])
     if result.get("grupo_id"):
         result["grupo_id"] = str(result["grupo_id"])
     return result
@@ -290,8 +283,7 @@ def lambda_handler(event, context):
             if error is None:
                 # Validate structure
                 plantilla_id = event["pathParameters"]["id"]
-                plantilla_data = PlantillaUpdateModel(**data).__dict__
-                plantilla_data["fecha_modificacion"] = local_now()
+                plantilla_data = PlantillaModel(**data).__dict__
                 client = connect_db_client()
                 if client:
                     plantilla_collection = client[str(PLANTILLAS_CRUD_DB)][COLLECTION]
