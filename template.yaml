@@ -1,0 +1,141 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  plantillas_crud
+
+  Sample SAM Template for plantillas_crud
+
+Globals:
+  Function:
+    Timeout: 60
+
+Parameters:
+  CrudUsername:
+    Description: Database User Username
+    Type: String
+    Default: ""
+  CrudPass:
+    Type: String
+    Default: ""
+  CrudHost:
+    Type: String
+    Default: ""
+  CrudPort:
+    Type: String
+    Default: ""
+  CrudDB:
+    Type: String
+    Default: "plantillas_crud"
+  Timezone:
+    Type: String
+    Default: "America/Bogota"
+
+Resources:
+  CrudPlantillaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/crud_plantilla/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Environment:
+        Variables:
+          PLANTILLAS_CRUD_HOST: !Ref CrudHost
+          PLANTILLAS_CRUD_PORT: !Ref CrudPort
+          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
+          PLANTILLAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_DB: !Ref CrudDB
+          TIMEZONE: !Ref Timezone
+      Events:
+        CreatePlantilla:
+          Type: Api
+          Properties:
+            Path: /plantilla
+            Method: post
+
+        GetPlantilla:
+          Type: Api
+          Properties:
+            Path: /plantilla/{id}
+            Method: get
+
+        GetAllPlantilla:
+          Type: Api
+          Properties:
+            Path: /plantilla
+            Method: get
+
+        PutPlantilla:
+          Type: Api
+          Properties:
+            Path: /plantilla/{id}
+            Method: put
+
+        DeletePlantilla:
+          Type: Api
+          Properties:
+            Path: /plantilla/{id}
+            Method: delete
+
+  CrudTipoPlantillaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/crud_tipo_plantilla/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Environment:
+        Variables:
+          PLANTILLAS_CRUD_HOST: !Ref CrudHost
+          PLANTILLAS_CRUD_PORT: !Ref CrudPort
+          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
+          PLANTILLAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_DB: !Ref CrudDB
+          TIMEZONE: !Ref Timezone
+      Events:
+        CreatePlantilla:
+          Type: Api
+          Properties:
+            Path: /tipo_plantilla
+            Method: post
+
+        GetPlantilla:
+          Type: Api
+          Properties:
+            Path: /tipo_plantilla/{id}
+            Method: get
+
+        GetAllPlantilla:
+          Type: Api
+          Properties:
+            Path: /tipo_plantilla
+            Method: get
+
+        PutPlantilla:
+          Type: Api
+          Properties:
+            Path: /tipo_plantilla/{id}
+            Method: put
+
+        DeletePlantilla:
+          Type: Api
+          Properties:
+            Path: /tipo_plantilla/{id}
+            Method: delete
+
+  HealthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/health/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Timeout: 10
+      Events:
+        Health:
+          Type: Api
+          Properties:
+            Path: /health
+            Method: get
+
+Outputs:
+  WebEndpoint:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
