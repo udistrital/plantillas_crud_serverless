@@ -1,4 +1,4 @@
-# Plantilals CRUD Lambda
+# Plantillas CRUD Lambda
 
 PLANTILLAS CRUD empleando con AWS SAM.
 
