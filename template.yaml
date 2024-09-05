@@ -1,22 +1,13 @@
-
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  plantillas-crud
+  plantillas_crud
 
-  SAM Template for plantillas-crud
-
+  Sample SAM Template for plantillas_crud
 
 Globals:
   Function:
     Timeout: 60
-  Api:
-    Cors:
-      AllowMethods: "'GET,POST,OPTIONS'"
-      AllowHeaders: "'*'"
-      AllowOrigin: "'*'"
-      AllowCredentials: "'*'"
-      
 
 Parameters:
   CrudUsername:
@@ -34,24 +25,24 @@ Parameters:
     Default: ""
   CrudDB:
     Type: String
-    Default: "plantillas_bd_local"
+    Default: "plantillas_crud"
   Timezone:
     Type: String
     Default: "America/Bogota"
 
 Resources:
-  CreatePlantillaFunction:
+  CrudPlantillaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/handlers/create_plantilla/
+      CodeUri: src/handlers/crud_plantilla/
       Handler: app.lambda_handler
-      Runtime: python3.7
+      Runtime: python3.10
       Environment:
         Variables:
           PLANTILLAS_CRUD_HOST: !Ref CrudHost
           PLANTILLAS_CRUD_PORT: !Ref CrudPort
           PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
-          PLANTILAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_PASS: !Ref CrudPass
           PLANTILLAS_CRUD_DB: !Ref CrudDB
           TIMEZONE: !Ref Timezone
       Events:
@@ -60,87 +51,65 @@ Resources:
           Properties:
             Path: /plantilla
             Method: post
-
-  GetPlantillaFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/handlers/get_plantilla/
-      Handler: app.lambda_handler
-      Runtime: python3.7
-      Environment:
-        Variables:
-          PLANTILLAS_CRUD_HOST: !Ref CrudHost
-          PLANTILLAS_CRUD_PORT: !Ref CrudPort
-          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
-          PLANTILAS_CRUD_PASS: !Ref CrudPass
-          PLANTILLAS_CRUD_DB: !Ref CrudDB
-      Events:
         GetPlantilla:
           Type: Api
           Properties:
             Path: /plantilla/{id}
             Method: get
-
-  GetAllPlantillaFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/handlers/get_all_plantilla/
-      Handler: app.lambda_handler
-      Runtime: python3.7
-      Environment:
-        Variables:
-          PLANTILLAS_CRUD_HOST: !Ref CrudHost
-          PLANTILLAS_CRUD_PORT: !Ref CrudPort
-          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
-          PLANTILAS_CRUD_PASS: !Ref CrudPass
-          PLANTILLAS_CRUD_DB: !Ref CrudDB
-      Events:
-        GetSyllabus:
+        GetAllPlantilla:
           Type: Api
           Properties:
             Path: /plantilla
             Method: get
-
-  PutPlantillaFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/handlers/put_plantilla/
-      Handler: app.lambda_handler
-      Runtime: python3.7
-      Environment:
-        Variables:
-          PLANTILLAS_CRUD_HOST: !Ref CrudHost
-          PLANTILLAS_CRUD_PORT: !Ref CrudPort
-          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
-          PLANTILAS_CRUD_PASS: !Ref CrudPass
-          PLANTILLAS_CRUD_DB: !Ref CrudDB
-          TIMEZONE: !Ref Timezone
-      Events:
-        PutSyllabus:
+        PutPlantilla:
           Type: Api
           Properties:
             Path: /plantilla/{id}
             Method: put
 
-  DeletePlantillaFunction:
+  CrudTipoPlantillaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/handlers/delete_plantilla/
+      CodeUri: src/handlers/crud_tipo_plantilla/
       Handler: app.lambda_handler
-      Runtime: python3.7
+      Runtime: python3.10
       Environment:
         Variables:
           PLANTILLAS_CRUD_HOST: !Ref CrudHost
           PLANTILLAS_CRUD_PORT: !Ref CrudPort
           PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
-          PLANTILAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_PASS: !Ref CrudPass
           PLANTILLAS_CRUD_DB: !Ref CrudDB
           TIMEZONE: !Ref Timezone
       Events:
-        DeleteSyllabus:
+        CreatePlantilla:
           Type: Api
           Properties:
-            Path: /plantilla/{id}
+            Path: /tipo_plantilla
+            Method: post
+
+        GetPlantilla:
+          Type: Api
+          Properties:
+            Path: /tipo_plantilla/{id}
+            Method: get
+
+        GetAllPlantilla:
+          Type: Api
+          Properties:
+            Path: /tipo_plantilla
+            Method: get
+
+        PutPlantilla:
+          Type: Api
+          Properties:
+            Path: /tipo_plantilla/{id}
+            Method: put
+
+        DeletePlantilla:
+          Type: Api
+          Properties:
+            Path: /tipo_plantilla/{id}
             Method: delete
 
   HealthFunction:
@@ -148,7 +117,8 @@ Resources:
     Properties:
       CodeUri: src/handlers/health/
       Handler: app.lambda_handler
-      Runtime: python3.7
+      Runtime: python3.10
+      Timeout: 10
       Events:
         Health:
           Type: Api
