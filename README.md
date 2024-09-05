@@ -5,7 +5,7 @@ PLANTILLAS CRUD empleando con AWS SAM.
 ## Especificaciones Técnicas
 
 ### Tecnologías Implementadas y Versiones
-* [Python 3.9](https://docs.python.org/3.9/)
+* [Python 3.10](https://docs.python.org/3.10/)
 * [AWS SAM](https://docs.aws.amazon.com/es_es/serverless-application-model/latest/developerguide/using-sam-cli.html)
 * [AWS SAM CLI](https://docs.aws.amazon.com/es_es/serverless-application-model/latest/developerguide/install-sam-cli.html)
 * Opcional (Requerido para ejecutar el servicio API en local, simula el API Gateway) [Docker](https://docs.docker.com/engine/install/ubuntu/)
