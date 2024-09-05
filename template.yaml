@@ -51,30 +51,21 @@ Resources:
           Properties:
             Path: /plantilla
             Method: post
-
         GetPlantilla:
           Type: Api
           Properties:
             Path: /plantilla/{id}
             Method: get
-
         GetAllPlantilla:
           Type: Api
           Properties:
             Path: /plantilla
             Method: get
-
         PutPlantilla:
           Type: Api
           Properties:
             Path: /plantilla/{id}
             Method: put
-
-        DeletePlantilla:
-          Type: Api
-          Properties:
-            Path: /plantilla/{id}
-            Method: delete
 
   CrudTipoPlantillaFunction:
     Type: AWS::Serverless::Function
