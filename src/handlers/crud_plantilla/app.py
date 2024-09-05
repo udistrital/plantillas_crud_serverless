@@ -35,7 +35,7 @@ def local_now():
 class PlantillaModel(BaseModel):
     """Modelo de datos de Plantilla"""   
     tipo_plantilla_id: str
-    sistema_id: str
+    sistema_id: int
     nombre: Optional[str] = None
     codigo_abreviacion: Optional[str] = None
     contenido: Optional[str] = None
@@ -93,7 +93,7 @@ def parse_body(event) -> tuple:
 
 def get_query(query_str: str) -> dict:
     query_total = {}
-    int_fields = ['version']
+    int_fields = ['version', 'sistema_id']
     for cond in query_str.split(","):
         kv = cond.split(":", 1)
         if len(kv) == 2:

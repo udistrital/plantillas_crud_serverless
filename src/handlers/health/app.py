@@ -7,6 +7,6 @@ def lambda_handler(event, context):
         "body": json.dumps({
             "Success": True,
             "Status": 200,
-            "Message": "Plantillas crud, funciones lambda con SAM"
+            "Message": "API CRUD Plantillas"
         })
     }

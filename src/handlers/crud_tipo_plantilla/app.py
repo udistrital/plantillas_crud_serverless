@@ -7,7 +7,7 @@ from datetime import datetime
 
 import pytz
 from bson import ObjectId
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from pymongo import MongoClient, ASCENDING, DESCENDING
 
 # Required environment variables
@@ -76,7 +76,6 @@ def parse_body(event) -> tuple:
 
 def get_query(query_str: str) -> dict:
     query_total = {}
-    int_fields = ['version']
     for cond in query_str.split(","):
         kv = cond.split(":", 1)
         if len(kv) == 2:
@@ -85,9 +84,6 @@ def get_query(query_str: str) -> dict:
                 v = False
             elif v == 'true':
                 v = True
-
-            if k in int_fields:
-                v = int(v)
 
             if k == "_id":
                 v = ObjectId(v)

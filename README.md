@@ -52,5 +52,7 @@ sam deploy --guided
 
 ## Estado CI
 
+## Modelo de Datos
+![Modelo de datos plantillas](/database/plantillas_crud.png)
 
 ## Licencia
