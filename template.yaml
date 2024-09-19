@@ -25,7 +25,7 @@ Parameters:
     Default: ""
   CrudDB:
     Type: String
-    Default: "plantillas_crud"
+    Default: ""
   Timezone:
     Type: String
     Default: "America/Bogota"
