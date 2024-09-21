@@ -25,7 +25,7 @@ Parameters:
     Default: ""
   CrudDB:
     Type: String
-    Default: "plantillas_crud"
+    Default: ""
   Timezone:
     Type: String
     Default: "America/Bogota"
@@ -51,21 +51,30 @@ Resources:
           Properties:
             Path: /plantilla
             Method: post
+
         GetPlantilla:
           Type: Api
           Properties:
             Path: /plantilla/{id}
             Method: get
+
         GetAllPlantilla:
           Type: Api
           Properties:
             Path: /plantilla
             Method: get
+
         PutPlantilla:
           Type: Api
           Properties:
             Path: /plantilla/{id}
             Method: put
+
+        DeletePlantilla:
+          Type: Api
+          Properties:
+            Path: /plantilla/{id}
+            Method: delete
 
   CrudTipoPlantillaFunction:
     Type: AWS::Serverless::Function
@@ -82,31 +91,31 @@ Resources:
           PLANTILLAS_CRUD_DB: !Ref CrudDB
           TIMEZONE: !Ref Timezone
       Events:
-        CreatePlantilla:
+        CreateTipoPlantilla:
           Type: Api
           Properties:
             Path: /tipo_plantilla
             Method: post
 
-        GetPlantilla:
+        GetTipoPlantilla:
           Type: Api
           Properties:
             Path: /tipo_plantilla/{id}
             Method: get
 
-        GetAllPlantilla:
+        GetAllTipoPlantilla:
           Type: Api
           Properties:
             Path: /tipo_plantilla
             Method: get
 
-        PutPlantilla:
+        PutTipoPlantilla:
           Type: Api
           Properties:
             Path: /tipo_plantilla/{id}
             Method: put
 
-        DeletePlantilla:
+        DeleteTipoPlantilla:
           Type: Api
           Properties:
             Path: /tipo_plantilla/{id}

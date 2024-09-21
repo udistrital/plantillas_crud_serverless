@@ -17,6 +17,11 @@ lint = true
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
+stack_name = "plantillas-crud"
+s3_prefix = "plantillas-crud"
+region = "us-east-1"
+parameter_overrides = "CrudUsername=\"\" CrudPass=\"\" CrudHost=\"\" CrudPort=\"\" CrudDB=\"\" Timezone=\"America/Bogota\""
+image_repositories = []
 
 [default.package.parameters]
 resolve_s3 = true
