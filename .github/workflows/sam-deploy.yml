@@ -1,0 +1,36 @@
+on:
+  push:
+    branches:
+      - release/*
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref == 'refs/heads/master' && 'prod' || 'test' }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+      - uses: aws-actions/setup-sam@v2
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - run: sam build --use-container
+      - run: |
+          sam deploy \
+            --stack-name ${{ vars.STACK_NAME }} \
+            --region ${{ secrets.AWS_REGION }} \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --resolve-s3 \
+            --parameter-overrides \
+              CrudHost="${{ vars.PLANTILLAS_CRUD_HOST }}" \
+              CrudPort="${{ vars.PLANTILLAS_CRUD_PORT }}" \
+              CrudDB="${{ vars.PLANTILLAS_CRUD_DB }}" \
+              CrudUsername="${{ secrets.PLANTILLAS_CRUD_USERNAME }}" \
+              CrudPass="${{ secrets.PLANTILLAS_CRUD_PASS }}" \
+              Timezone="${{ vars.TIMEZONE }}" \
+            --capabilities CAPABILITY_IAM

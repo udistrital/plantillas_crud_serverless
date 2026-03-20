@@ -37,6 +37,9 @@ Resources:
       CodeUri: src/handlers/crud_plantilla/
       Handler: app.lambda_handler
       Runtime: python3.10
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSLambdaBasicExecutionRole
       Environment:
         Variables:
           PLANTILLAS_CRUD_HOST: !Ref CrudHost
@@ -82,6 +85,9 @@ Resources:
       CodeUri: src/handlers/crud_tipo_plantilla/
       Handler: app.lambda_handler
       Runtime: python3.10
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSLambdaBasicExecutionRole
       Environment:
         Variables:
           PLANTILLAS_CRUD_HOST: !Ref CrudHost
