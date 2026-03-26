@@ -31,7 +31,7 @@ def local_now():
 
 
 class TipoPlantillaModel(BaseModel):
-    """Modelo de datos de TipoPlantilla"""   
+    """Modelo de datos de TipoPlantilla"""
     nombre: str
     descripcion: str
     codigo_abreviacion: str
@@ -47,7 +47,7 @@ def connect_db_client():
         else:
             # Without password
             uri = f"mongodb://{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
-        
+
         client = MongoClient(uri, uuidRepresentation='standard')
         print("Successful connection to the database")
         return client
@@ -246,8 +246,9 @@ def lambda_handler(event, context):
                     return response
                 return format_response({}, "Error registering new tipo_plantilla!", 500, False)
             else:
-                return format_response({}, "Error registering new tipo_plantilla! Detail: Error in input data", 500, False)
-            
+                return format_response({}, "Error registering new tipo_plantilla! Detail: Error in input data", 500,
+                                       False)
+
         elif http_method == 'PUT':
             data, error = parse_body(event)
             if error is None:
@@ -263,7 +264,7 @@ def lambda_handler(event, context):
                 return format_response({}, "Error updating tipo_plantilla!", 500, False)
             else:
                 return format_response(error, "Error updating tipo_plantilla! Detail: Error in input data", 500, False)
-            
+
         elif http_method == 'DELETE':
             tipo_plantilla_id = event["pathParameters"]["id"]
             client = connect_db_client()
@@ -273,7 +274,7 @@ def lambda_handler(event, context):
                 close_connect_db(client)
                 return response
             return format_response(None, "Error deleting tipo_plantilla!", 500, False)
-        
+
         elif http_method == 'GET':
             client = connect_db_client()
             if client:
@@ -296,7 +297,7 @@ def lambda_handler(event, context):
                             404,
                             True)
             return format_response({}, "Error getting tipo_plantilla!", 500, False)
-        
+
         else:
             close_connect_db(client)
             return format_response({}, f"HTTP method not allowed", 500, False)
