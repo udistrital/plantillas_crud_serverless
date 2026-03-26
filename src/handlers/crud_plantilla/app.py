@@ -33,7 +33,7 @@ def local_now():
 
 
 class PlantillaModel(BaseModel):
-    """Modelo de datos de Plantilla"""   
+    """Modelo de datos de Plantilla"""
     tipo_plantilla_id: str
     sistema_id: int
     nombre: Optional[str] = None
@@ -64,7 +64,7 @@ def connect_db_client():
         else:
             # Without password
             uri = f"mongodb://{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
-        
+
         client = MongoClient(uri, uuidRepresentation='standard')
         print("Successful connection to the database")
         return client
@@ -229,7 +229,7 @@ def update(_id, data, collection):
 def delete(_id, data, collection):
     try:
         filter_ = {"_id": ObjectId(_id)}
-        result = collection.update_one(filter_,{"$set": data})
+        result = collection.update_one(filter_, {"$set": data})
         if result.modified_count:
             updated_data = collection.find_one(filter_)
             return format_response(updated_data, "Delete successful", 200, True)
@@ -277,7 +277,7 @@ def lambda_handler(event, context):
                 return format_response({}, "Error registering new plantilla!", 500, False)
             else:
                 return format_response({}, "Error registering new plantilla! Detail: Error in input data", 500, False)
-            
+
         elif http_method == 'PUT':
             data, error = parse_body(event)
             if error is None:
@@ -293,7 +293,7 @@ def lambda_handler(event, context):
                 return format_response({}, "Error updating plantilla!", 500, False)
             else:
                 return format_response(error, "Error updating plantilla! Detail: Error in input data", 500, False)
-            
+
         elif http_method == 'DELETE':
             plantilla_id = event["pathParameters"]["id"]
             plantilla_data = DeletePlantillaModel().__dict__
@@ -304,7 +304,7 @@ def lambda_handler(event, context):
                 close_connect_db(client)
                 return response
             return format_response(None, "Error deleting plantilla!", 500, False)
-        
+
         elif http_method == 'GET':
             client = connect_db_client()
             if client:
@@ -327,7 +327,7 @@ def lambda_handler(event, context):
                             404,
                             True)
             return format_response({}, "Error getting plantilla!", 500, False)
-        
+
         else:
             close_connect_db(client)
             return format_response({}, f"HTTP method not allowed", 500, False)

@@ -36,7 +36,7 @@ Resources:
     Properties:
       CodeUri: src/handlers/crud_plantilla/
       Handler: app.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.12
       Environment:
         Variables:
           PLANTILLAS_CRUD_HOST: !Ref CrudHost
@@ -126,7 +126,7 @@ Resources:
     Properties:
       CodeUri: src/handlers/health/
       Handler: app.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.12
       Timeout: 10
       Events:
         Health:
