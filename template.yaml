@@ -82,6 +82,9 @@ Resources:
       CodeUri: src/handlers/crud_tipo_plantilla/
       Handler: app.lambda_handler
       Runtime: python3.10
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSLambdaBasicExecutionRole
       Environment:
         Variables:
           PLANTILLAS_CRUD_HOST: !Ref CrudHost
@@ -120,20 +123,6 @@ Resources:
           Properties:
             Path: /tipo_plantilla/{id}
             Method: delete
-
-  HealthFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/handlers/health/
-      Handler: app.lambda_handler
-      Runtime: python3.12
-      Timeout: 10
-      Events:
-        Health:
-          Type: Api
-          Properties:
-            Path: /health
-            Method: get
 
 Outputs:
   WebEndpoint:
