@@ -60,7 +60,7 @@ def connect_db_client():
     try:
         # With password
         if PLANTILLAS_CRUD_USERNAME and PLANTILLAS_CRUD_PASS:
-            uri = f"mongodb://{PLANTILLAS_CRUD_USERNAME}:{PLANTILLAS_CRUD_PASS}@{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
+            uri = f"mongodb://{PLANTILLAS_CRUD_USERNAME}:{PLANTILLAS_CRUD_PASS}@{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/?authSource=plantillas"
         else:
             # Without password
             uri = f"mongodb://{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
