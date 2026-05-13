@@ -29,6 +29,10 @@ Parameters:
   Timezone:
     Type: String
     Default: "America/Bogota"
+  AuthDB:
+    Type: String
+    Default: "plantillas"
+
 
 Resources:
   CrudPlantillaFunction:
@@ -47,6 +51,7 @@ Resources:
           PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
           PLANTILLAS_CRUD_PASS: !Ref CrudPass
           PLANTILLAS_CRUD_DB: !Ref CrudDB
+          PLANTILLAS_AUTH_DB: !Ref AuthDB
           TIMEZONE: !Ref Timezone
       Events:
         CreatePlantilla:
@@ -95,6 +100,7 @@ Resources:
           PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
           PLANTILLAS_CRUD_PASS: !Ref CrudPass
           PLANTILLAS_CRUD_DB: !Ref CrudDB
+          PLANTILLAS_AUTH_DB: !Ref AuthDB
           TIMEZONE: !Ref Timezone
       Events:
         CreateTipoPlantilla:

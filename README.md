@@ -19,6 +19,7 @@ PLANTILLAS_CRUD_PORT=[Puerto de conexión con la base de datos]
 PLANTILLAS_CRUD_USERNAME=[usuario con acceso a la base de datos]
 PLANTILLAS_CRUD_PASS=[password del usuario]
 PLANTILLAS_CRUD_DB=[nombre de la base de datos]
+PLANTILLAS_AUTH_DB=[auth de la base de datos]
 TIMEZONE=[zona horaria]
 ```
 
