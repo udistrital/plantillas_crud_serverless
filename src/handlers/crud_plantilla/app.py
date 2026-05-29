@@ -18,6 +18,7 @@ PLANTILLAS_CRUD_PORT = os.environ.get('PLANTILLAS_CRUD_PORT')
 PLANTILLAS_CRUD_USERNAME = os.environ.get('PLANTILLAS_CRUD_USERNAME')
 PLANTILLAS_CRUD_PASS = os.environ.get('PLANTILLAS_CRUD_PASS')
 PLANTILLAS_CRUD_DB = os.environ.get('PLANTILLAS_CRUD_DB')
+PLANTILLAS_AUTH_DB = os.environ.get('PLANTILLAS_AUTH_DB')
 TIMEZONE = os.environ.get('TIMEZONE')
 COLLECTION = "plantilla"
 
@@ -60,7 +61,7 @@ def connect_db_client():
     try:
         # With password
         if PLANTILLAS_CRUD_USERNAME and PLANTILLAS_CRUD_PASS:
-            uri = f"mongodb://{PLANTILLAS_CRUD_USERNAME}:{PLANTILLAS_CRUD_PASS}@{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
+            uri = f"mongodb://{PLANTILLAS_CRUD_USERNAME}:{PLANTILLAS_CRUD_PASS}@{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/?authSource={PLANTILLAS_AUTH_DB}"
         else:
             # Without password
             uri = f"mongodb://{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
@@ -174,6 +175,8 @@ def parse_query_params(event) -> tuple:
 def format_specific_values(result):
     if result.get("_id"):
         result["_id"] = str(result["_id"])
+    if result.get("tipo_plantilla_id"):
+        result["tipo_plantilla_id"] = str(result["tipo_plantilla_id"])
     if result.get("fecha_creacion"):
         result["fecha_creacion"] = str(result["fecha_creacion"])
     if result.get("grupo_id"):
@@ -211,11 +214,13 @@ def create(data, collection):
             return format_response(new_data, "Registration successful", 201, True)
         return format_response({}, "Registration unsuccessful", 400, False)
     except Exception as ex:
+        print(f"[Plantilla] Error service Post: {ex}")
         return format_response({}, f"Error service Post: {ex}", 500, False)
 
 
 def update(_id, data, collection):
     try:
+        print("[Plantilla] Update: ", _id)
         filter_ = {"_id": ObjectId(_id)}
         result = collection.update_one(filter_, {"$set": data})
         if result.modified_count:
@@ -223,11 +228,13 @@ def update(_id, data, collection):
             return format_response(updated_data, "Update successful", 200, True)
         return format_response({}, "Update unsuccessful", 400, False)
     except Exception as ex:
+        print(f"[Plantilla] Error service Put: {ex}")
         return format_response({}, f"Error service Put: {ex}", 500, False)
 
 
 def delete(_id, data, collection):
     try:
+        print("[Plantilla] Delete: ", _id)
         filter_ = {"_id": ObjectId(_id)}
         result = collection.update_one(filter_, {"$set": data})
         if result.modified_count:
@@ -235,26 +242,33 @@ def delete(_id, data, collection):
             return format_response(updated_data, "Delete successful", 200, True)
         return format_response(None, "Delete unsuccessful", 400, False)
     except Exception as ex:
+        print(f"[Plantilla] Error service Delete: {ex}")
         return format_response({}, f"Error service Delete: {ex}", 500, False)
 
 
 def get_all(query, collection):
     try:
+        print("[Plantilla] GetAll: ", query)
         data = list(collection.find(**query))
         if data:
+            print("[Plantilla] GetAll result: ", data)
             return format_response(data, "Request successful", 200, True)
         return format_response([], "Request successful", 200, True)
     except Exception as ex:
+        print(f"[Plantilla] Error service GetAll: {ex}")
         return format_response({}, f"Error service GetAll: {ex}", 500, False)
 
 
 def get_one(_id, collection):
     try:
+        print("[Plantilla] GetOne: find by id ", _id)
         data = collection.find_one({"_id": ObjectId(_id)})
         if data:
+            print("[Plantilla] GetOne result: ", data)
             return format_response(data, "Request successful", 200, True)
         return format_response({}, "Request unsuccessful", 404, False)
     except Exception as ex:
+        print(f"[Plantilla] Error service GetOne: {ex}")
         return format_response({}, f"Error service GetOne: {ex}", 500, False)
 
 

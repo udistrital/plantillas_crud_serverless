@@ -29,6 +29,10 @@ Parameters:
   Timezone:
     Type: String
     Default: "America/Bogota"
+  AuthDB:
+    Type: String
+    Default: "plantillas"
+
 
 Resources:
   CrudPlantillaFunction:
@@ -37,6 +41,9 @@ Resources:
       CodeUri: src/handlers/crud_plantilla/
       Handler: app.lambda_handler
       Runtime: python3.12
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSLambdaBasicExecutionRole
       Environment:
         Variables:
           PLANTILLAS_CRUD_HOST: !Ref CrudHost
@@ -44,6 +51,7 @@ Resources:
           PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
           PLANTILLAS_CRUD_PASS: !Ref CrudPass
           PLANTILLAS_CRUD_DB: !Ref CrudDB
+          PLANTILLAS_AUTH_DB: !Ref AuthDB
           TIMEZONE: !Ref Timezone
       Events:
         CreatePlantilla:
@@ -92,6 +100,7 @@ Resources:
           PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
           PLANTILLAS_CRUD_PASS: !Ref CrudPass
           PLANTILLAS_CRUD_DB: !Ref CrudDB
+          PLANTILLAS_AUTH_DB: !Ref AuthDB
           TIMEZONE: !Ref Timezone
       Events:
         CreateTipoPlantilla:
