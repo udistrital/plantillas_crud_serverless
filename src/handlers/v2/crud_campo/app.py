@@ -1,0 +1,363 @@
+# CRUD CAMPO (v2)
+# Get one, Get All, Post, Put and Delete endpoints
+
+import json
+import os
+from datetime import datetime
+from typing import Optional
+
+import pytz
+from bson import ObjectId
+from pydantic import BaseModel, Field
+from pymongo import MongoClient, ASCENDING, DESCENDING
+
+# Required environment variables
+PLANTILLAS_CRUD_HOST = os.environ.get('PLANTILLAS_CRUD_HOST')
+PLANTILLAS_CRUD_PORT = os.environ.get('PLANTILLAS_CRUD_PORT')
+PLANTILLAS_CRUD_USERNAME = os.environ.get('PLANTILLAS_CRUD_USERNAME')
+PLANTILLAS_CRUD_PASS = os.environ.get('PLANTILLAS_CRUD_PASS')
+PLANTILLAS_CRUD_DB = os.environ.get('PLANTILLAS_CRUD_DB')
+PLANTILLAS_AUTH_DB = os.environ.get('PLANTILLAS_AUTH_DB')
+TIMEZONE = os.environ.get('TIMEZONE')
+COLLECTION = "plantilla_vc_campo"
+
+# Formato de fecha del contrato v2 (equivale a "2006-01-02 15:04:05" en Go)
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+ORDER_LABEL = {
+    "desc": DESCENDING,
+    "asc": ASCENDING
+}
+
+# Campos que requieren conversión de tipo en el parámetro query
+INT_FIELDS = []
+OBJECT_ID_FIELDS = ['_id']
+
+
+def local_now():
+    """Datetime por Timezone"""
+    return datetime.now(tz=pytz.timezone(TIMEZONE))
+
+
+class CampoModel(BaseModel):
+    """Modelo de datos de Campo (v2)"""
+    tipo: str = Field(max_length=100)
+    html: Optional[str] = None
+    css: Optional[str] = None
+    activo: bool = Field(default=True)
+
+
+class CampoCreationModel(CampoModel):
+    fecha_creacion: datetime = Field(default_factory=local_now)
+    fecha_modificacion: datetime = Field(default_factory=local_now)
+
+
+class CampoUpdateModel(CampoModel):
+    """fecha_creacion no se expone en el update para no reescribir el histórico"""
+    fecha_modificacion: datetime = Field(default_factory=local_now)
+
+
+class DeleteCampoModel(BaseModel):
+    activo: bool = Field(default=False)
+    fecha_modificacion: datetime = Field(default_factory=local_now)
+
+
+# Gestión de conexión con la BD
+def connect_db_client():
+    """Genera el cliente para establecer la conexión con la base de datos"""
+    try:
+        # With password
+        if PLANTILLAS_CRUD_USERNAME and PLANTILLAS_CRUD_PASS:
+            uri = f"mongodb://{PLANTILLAS_CRUD_USERNAME}:{PLANTILLAS_CRUD_PASS}@{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/?authSource={PLANTILLAS_AUTH_DB}"
+        else:
+            # Without password
+            uri = f"mongodb://{PLANTILLAS_CRUD_HOST}:{PLANTILLAS_CRUD_PORT}/"
+
+        client = MongoClient(uri, uuidRepresentation='standard', tz_aware=True)
+        print("Successful connection to the database")
+        return client
+    except Exception as ex:
+        print(f"Error connecting to the database: {ex}")
+        return None
+
+
+def close_connect_db(client):
+    try:
+        print("Closing client DB")
+        if client:
+            client.close()
+    except Exception as ex:
+        print(f"Error close Client DB. Detail: {ex}")
+
+
+# Deserialización de parámetros de entrada
+# parse_body -> body de las peticiones POST, PUT, DELETE
+def parse_body(event) -> tuple:
+    try:
+        return json.loads(event["body"]), None
+    except Exception as ex:
+        return None, ex
+
+
+def parse_model(model, data) -> tuple:
+    """Valida la estructura de entrada contra el modelo de datos"""
+    try:
+        return model(**data).__dict__, None
+    except Exception as ex:
+        return None, ex
+
+
+def get_query(query_str: str) -> dict:
+    query_total = {}
+    for cond in query_str.split(","):
+        kv = cond.split(":", 1)
+        if len(kv) == 2:
+            k, v = kv
+            if v == 'false':
+                v = False
+            elif v == 'true':
+                v = True
+            elif v == 'null':
+                v = None
+
+            if v is not None:
+                if k in INT_FIELDS:
+                    v = int(v)
+                elif k in OBJECT_ID_FIELDS:
+                    v = ObjectId(v)
+        else:
+            k, v = kv[0], None
+        query_total[k] = v
+    return query_total
+
+
+def get_sort_by(query_params) -> list:
+    sort_by_total = []
+    if query_params.get("sortby"):
+        sort_by_list = str(query_params.get("sortby")).split(",")
+        if query_params.get("order"):
+            order_list = str(query_params.get("order")).split(",")
+            if len(order_list) == 1:
+                # Default ASCENDING
+                order_label = ORDER_LABEL.get(query_params.get("order"), ASCENDING)
+                sort_by_total = [(e, order_label) for e in sort_by_list]
+            elif len(order_list) == len(sort_by_list):
+                for i, e in enumerate(sort_by_list):
+                    order_label = ORDER_LABEL.get(order_list[i], ASCENDING)
+                    sort_by_total.append((e, order_label))
+            else:
+                # Default ASCENDING
+                sort_by_total = [(e, ASCENDING) for e in sort_by_list]
+    return sort_by_total
+
+
+def parse_query_params(event) -> tuple:
+    try:
+        query_params_result = {"limit": 10}
+        query_params = event["queryStringParameters"]
+        if isinstance(query_params, dict):
+            # query: k:v, k: v
+            if query_params.get("query"):
+                query_params_result["filter"] = get_query(str(query_params.get("query")))
+
+            # fields: col1, col2, entity.col3
+            if query_params.get("fields"):
+                query_params_result["projection"] = str(query_params.get("fields")).split(",")
+
+            # sortby: col1,col2
+            # order: desc,asc
+            if query_params.get("sortby"):
+                query_params_result["sort"] = get_sort_by(query_params)
+
+            # limit: 10 (default is 10)
+            if query_params.get("limit"):
+                query_params_result["limit"] = int(query_params.get("limit"))
+
+            # offset: 0 (default is 0)
+            if query_params.get("offset"):
+                query_params_result["skip"] = int(query_params.get("offset"))
+
+            return query_params_result, None
+        else:
+            return query_params_result, None
+    except Exception as ex:
+        print(f"Error in parse_query_params. Detail: {ex}")
+        return {}, ex
+
+
+# Formato de respuestas
+def format_document(value):
+    """Serializa ObjectId y datetime de forma recursiva para la respuesta JSON"""
+    if isinstance(value, list):
+        return [format_document(item) for item in value]
+    if isinstance(value, dict):
+        return {k: format_document(v) for k, v in value.items()}
+    if isinstance(value, ObjectId):
+        return str(value)
+    if isinstance(value, datetime):
+        if value.tzinfo is None:
+            value = pytz.utc.localize(value)
+        return value.astimezone(pytz.timezone(TIMEZONE)).strftime(DATETIME_FORMAT)
+    return value
+
+
+def format_response(result, message: str, status_code: int, success: bool) -> dict:
+    """Formats the HTTP response."""
+    body = {
+        "Success": success,
+        "Status": status_code,
+        "Message": message
+    }
+    if success and result is not None:
+        body["Data"] = format_document(result)
+    return {"statusCode": status_code, "body": json.dumps(body)}
+
+
+def create(data, collection):
+    try:
+        print("[Campo v2] Create: ", data)
+        result = collection.insert_one(data)
+        if result:
+            new_data = collection.find_one(result.inserted_id)
+            return format_response(new_data, "Registration successful", 201, True)
+        return format_response({}, "Registration unsuccessful", 400, False)
+    except Exception as ex:
+        print(f"[Campo v2] Error service Post: {ex}")
+        return format_response({}, f"Error service Post: {ex}", 500, False)
+
+
+def update(_id, data, collection):
+    try:
+        print("[Campo v2] Update: ", _id)
+        filter_ = {"_id": ObjectId(_id)}
+        result = collection.update_one(filter_, {"$set": data})
+        if result.matched_count:
+            updated_data = collection.find_one(filter_)
+            return format_response(updated_data, "Update successful", 200, True)
+        return format_response({}, "Update unsuccessful", 400, False)
+    except Exception as ex:
+        print(f"[Campo v2] Error service Put: {ex}")
+        return format_response({}, f"Error service Put: {ex}", 500, False)
+
+
+def delete(_id, data, collection):
+    """Borrado lógico: preserva la integridad referencial con estructura"""
+    try:
+        print("[Campo v2] Delete: ", _id)
+        filter_ = {"_id": ObjectId(_id)}
+        result = collection.update_one(filter_, {"$set": data})
+        if result.matched_count:
+            updated_data = collection.find_one(filter_)
+            return format_response(updated_data, "Delete successful", 200, True)
+        return format_response(None, "Delete unsuccessful", 400, False)
+    except Exception as ex:
+        print(f"[Campo v2] Error service Delete: {ex}")
+        return format_response({}, f"Error service Delete: {ex}", 500, False)
+
+
+def get_all(query, collection):
+    try:
+        print("[Campo v2] GetAll: ", query)
+        data = list(collection.find(**query))
+        if data:
+            print("[Campo v2] GetAll result: ", data)
+            return format_response(data, "Request successful", 200, True)
+        return format_response([], "Request successful", 200, True)
+    except Exception as ex:
+        print(f"[Campo v2] Error service GetAll: {ex}")
+        return format_response({}, f"Error service GetAll: {ex}", 500, False)
+
+
+def get_one(_id, collection):
+    try:
+        print("[Campo v2] GetOne: find by id ", _id)
+        data = collection.find_one({"_id": ObjectId(_id)})
+        if data:
+            print("[Campo v2] GetOne result: ", data)
+            return format_response(data, "Request successful", 200, True)
+        return format_response({}, "Request unsuccessful", 404, False)
+    except Exception as ex:
+        print(f"[Campo v2] Error service GetOne: {ex}")
+        return format_response({}, f"Error service GetOne: {ex}", 500, False)
+
+
+def lambda_handler(event, context):
+    client = None
+    try:
+        http_method = event['httpMethod']
+
+        if http_method == 'POST':
+            data, error = parse_body(event)
+            if error is None:
+                # Validate structure
+                campo_data, error = parse_model(CampoCreationModel, data)
+                if error is not None:
+                    return format_response({}, f"Error registering new campo! Detail: {error}", 400, False)
+                client = connect_db_client()
+                if client:
+                    campo_collection = client[str(PLANTILLAS_CRUD_DB)][COLLECTION]
+                    response = create(campo_data, campo_collection)
+                    close_connect_db(client)
+                    return response
+                return format_response({}, "Error registering new campo!", 500, False)
+            else:
+                return format_response({}, "Error registering new campo! Detail: Error in input data", 400, False)
+
+        elif http_method == 'PUT':
+            data, error = parse_body(event)
+            if error is None:
+                # Validate structure
+                campo_id = event["pathParameters"]["id"]
+                campo_data, error = parse_model(CampoUpdateModel, data)
+                if error is not None:
+                    return format_response({}, f"Error updating campo! Detail: {error}", 400, False)
+                client = connect_db_client()
+                if client:
+                    campo_collection = client[str(PLANTILLAS_CRUD_DB)][COLLECTION]
+                    response = update(campo_id, campo_data, campo_collection)
+                    close_connect_db(client)
+                    return response
+                return format_response({}, "Error updating campo!", 500, False)
+            else:
+                return format_response({}, "Error updating campo! Detail: Error in input data", 400, False)
+
+        elif http_method == 'DELETE':
+            campo_id = event["pathParameters"]["id"]
+            campo_data = DeleteCampoModel().__dict__
+            client = connect_db_client()
+            if client:
+                campo_collection = client[str(PLANTILLAS_CRUD_DB)][COLLECTION]
+                response = delete(campo_id, campo_data, campo_collection)
+                close_connect_db(client)
+                return response
+            return format_response(None, "Error deleting campo!", 500, False)
+
+        elif http_method == 'GET':
+            client = connect_db_client()
+            if client:
+                campo_collection = client[str(PLANTILLAS_CRUD_DB)][COLLECTION]
+                if 'pathParameters' in event and event['pathParameters'] is not None:
+                    _id = event["pathParameters"]["id"]
+                    response = get_one(_id, campo_collection)
+                    close_connect_db(client)
+                    return response
+                else:
+                    query_complement, err = parse_query_params(event)
+                    if err is None:
+                        response = get_all(query_complement, campo_collection)
+                        close_connect_db(client)
+                        return response
+                    else:
+                        return format_response(
+                            {},
+                            "Error service GetAll: The request contains an incorrect parameter or no record exists",
+                            404,
+                            True)
+            return format_response({}, "Error getting campo!", 500, False)
+
+        else:
+            close_connect_db(client)
+            return format_response({}, "HTTP method not allowed", 500, False)
+    except Exception as ex:
+        close_connect_db(client)
+        return format_response({}, f"Error in campo request! Detail: {ex}", 500, False)

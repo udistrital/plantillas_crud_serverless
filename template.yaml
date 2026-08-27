@@ -84,6 +84,38 @@ Resources:
             Path: /plantilla/{id}
             Method: delete
 
+        # Alias /v1 de las rutas anteriores. Las rutas sin prefijo se conservan
+        # para no romper los consumidores actuales.
+        CreatePlantillaV1:
+          Type: Api
+          Properties:
+            Path: /v1/plantilla
+            Method: post
+
+        GetPlantillaV1:
+          Type: Api
+          Properties:
+            Path: /v1/plantilla/{id}
+            Method: get
+
+        GetAllPlantillaV1:
+          Type: Api
+          Properties:
+            Path: /v1/plantilla
+            Method: get
+
+        PutPlantillaV1:
+          Type: Api
+          Properties:
+            Path: /v1/plantilla/{id}
+            Method: put
+
+        DeletePlantillaV1:
+          Type: Api
+          Properties:
+            Path: /v1/plantilla/{id}
+            Method: delete
+
   CrudTipoPlantillaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -131,6 +163,238 @@ Resources:
           Type: Api
           Properties:
             Path: /tipo_plantilla/{id}
+            Method: delete
+
+        # Alias /v1 de las rutas anteriores. Las rutas sin prefijo se conservan
+        # para no romper los consumidores actuales.
+        CreateTipoPlantillaV1:
+          Type: Api
+          Properties:
+            Path: /v1/tipo_plantilla
+            Method: post
+
+        GetTipoPlantillaV1:
+          Type: Api
+          Properties:
+            Path: /v1/tipo_plantilla/{id}
+            Method: get
+
+        GetAllTipoPlantillaV1:
+          Type: Api
+          Properties:
+            Path: /v1/tipo_plantilla
+            Method: get
+
+        PutTipoPlantillaV1:
+          Type: Api
+          Properties:
+            Path: /v1/tipo_plantilla/{id}
+            Method: put
+
+        DeleteTipoPlantillaV1:
+          Type: Api
+          Properties:
+            Path: /v1/tipo_plantilla/{id}
+            Method: delete
+
+  # ---------------------------------------------------------------------------
+  # v2 - Versionamiento controlado de plantillas
+  # Modelo: plantilla -> plantilla_version -> estructura -> campo
+  # ---------------------------------------------------------------------------
+  V2CrudPlantillaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/v2/crud_plantilla/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          PLANTILLAS_CRUD_HOST: !Ref CrudHost
+          PLANTILLAS_CRUD_PORT: !Ref CrudPort
+          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
+          PLANTILLAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_DB: !Ref CrudDB
+          PLANTILLAS_AUTH_DB: !Ref AuthDB
+          TIMEZONE: !Ref Timezone
+      Events:
+        CreateV2Plantilla:
+          Type: Api
+          Properties:
+            Path: /v2/plantilla
+            Method: post
+
+        GetV2Plantilla:
+          Type: Api
+          Properties:
+            Path: /v2/plantilla/{id}
+            Method: get
+
+        GetAllV2Plantilla:
+          Type: Api
+          Properties:
+            Path: /v2/plantilla
+            Method: get
+
+        PutV2Plantilla:
+          Type: Api
+          Properties:
+            Path: /v2/plantilla/{id}
+            Method: put
+
+        DeleteV2Plantilla:
+          Type: Api
+          Properties:
+            Path: /v2/plantilla/{id}
+            Method: delete
+
+  V2CrudCampoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/v2/crud_campo/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          PLANTILLAS_CRUD_HOST: !Ref CrudHost
+          PLANTILLAS_CRUD_PORT: !Ref CrudPort
+          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
+          PLANTILLAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_DB: !Ref CrudDB
+          PLANTILLAS_AUTH_DB: !Ref AuthDB
+          TIMEZONE: !Ref Timezone
+      Events:
+        CreateV2Campo:
+          Type: Api
+          Properties:
+            Path: /v2/campo
+            Method: post
+
+        GetV2Campo:
+          Type: Api
+          Properties:
+            Path: /v2/campo/{id}
+            Method: get
+
+        GetAllV2Campo:
+          Type: Api
+          Properties:
+            Path: /v2/campo
+            Method: get
+
+        PutV2Campo:
+          Type: Api
+          Properties:
+            Path: /v2/campo/{id}
+            Method: put
+
+        DeleteV2Campo:
+          Type: Api
+          Properties:
+            Path: /v2/campo/{id}
+            Method: delete
+
+  V2CrudPlantillaVersionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/v2/crud_plantilla_version/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          PLANTILLAS_CRUD_HOST: !Ref CrudHost
+          PLANTILLAS_CRUD_PORT: !Ref CrudPort
+          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
+          PLANTILLAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_DB: !Ref CrudDB
+          PLANTILLAS_AUTH_DB: !Ref AuthDB
+          TIMEZONE: !Ref Timezone
+      Events:
+        CreateV2PlantillaVersion:
+          Type: Api
+          Properties:
+            Path: /v2/plantilla_version
+            Method: post
+
+        GetV2PlantillaVersion:
+          Type: Api
+          Properties:
+            Path: /v2/plantilla_version/{id}
+            Method: get
+
+        GetAllV2PlantillaVersion:
+          Type: Api
+          Properties:
+            Path: /v2/plantilla_version
+            Method: get
+
+        PutV2PlantillaVersion:
+          Type: Api
+          Properties:
+            Path: /v2/plantilla_version/{id}
+            Method: put
+
+        DeleteV2PlantillaVersion:
+          Type: Api
+          Properties:
+            Path: /v2/plantilla_version/{id}
+            Method: delete
+
+  V2CrudEstructuraFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/v2/crud_estructura/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          PLANTILLAS_CRUD_HOST: !Ref CrudHost
+          PLANTILLAS_CRUD_PORT: !Ref CrudPort
+          PLANTILLAS_CRUD_USERNAME: !Ref CrudUsername
+          PLANTILLAS_CRUD_PASS: !Ref CrudPass
+          PLANTILLAS_CRUD_DB: !Ref CrudDB
+          PLANTILLAS_AUTH_DB: !Ref AuthDB
+          TIMEZONE: !Ref Timezone
+      Events:
+        CreateV2Estructura:
+          Type: Api
+          Properties:
+            Path: /v2/estructura
+            Method: post
+
+        GetV2Estructura:
+          Type: Api
+          Properties:
+            Path: /v2/estructura/{id}
+            Method: get
+
+        GetAllV2Estructura:
+          Type: Api
+          Properties:
+            Path: /v2/estructura
+            Method: get
+
+        PutV2Estructura:
+          Type: Api
+          Properties:
+            Path: /v2/estructura/{id}
+            Method: put
+
+        DeleteV2Estructura:
+          Type: Api
+          Properties:
+            Path: /v2/estructura/{id}
             Method: delete
 
 Outputs:
